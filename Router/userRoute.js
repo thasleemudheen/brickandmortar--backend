@@ -2,6 +2,10 @@ const express=require('express')
 const app=express()
 const router=express.Router()
 const userController=require('../Controllers/userController')
-
+const protected=require('../middleWares/authMiddleWare')
 router.post('/signup',userController.signupPostpage)
+router.post('/login',userController.UserLoginPostPage)
+router.post('/verifyOtp',userController.verifyOtpForsignup)
+router.post('/refresh',userController.refreshAccessToken)
+router.get('/',protected,userController.userHOmePage)
 module.exports=router

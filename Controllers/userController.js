@@ -3,6 +3,8 @@ const app=express()
 const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 const User=require('../Models/userModel')
+const otpService = require('../services/otpService')
+const {generateAccessToken,generateRefreshToken}=require('../services/tokenService')
 
 const signupPostpage=async(req,res)=>{
     console.log(req.body)
@@ -12,27 +14,91 @@ const signupPostpage=async(req,res)=>{
         if(existUser){
             return res.status(404).json({message:"the email is already exist "})
         }
-        const hashedPassword=await bcrypt.hash(password,10)
-        console.log(hashedPassword)
-
-        const newUser=new User({
-            userName,
-            userEmail,
-            password:hashedPassword,
-            userPhone
-        })
-        await newUser.save()
-        res.status(200).json({message:'user signup successfully'})
+        const otp=otpService.generateOTP()
+        await otpService.sendOTP(userEmail,otp)
+        res.cookie('uotp',otp,{httpOnly:false,expires: new Date(Date.now() + 5 * 60 * 1000)})
+        res.status(200).json({message:'successfully send otp'})
     } catch (error) {
         console.log(error)
         res.status(500).json({message:'internal server error'})
     }
    
 }
+const refreshAccessToken = (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+        return res.status(403).json({ message: 'Refresh token not provided' });
+    }
+
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Invalid refresh token' });
+        }
+
+        const newAccessToken = generateAccessToken(user);
+        res.json({ accessToken: newAccessToken });
+    });
+};
+
+const verifyOtpForsignup=async(req,res)=>{
+    console.log(req.body)
+    const origin=req.cookies.uotp
+    const {data,otp}=req.body
+    if(origin!==otp){
+        return res.status(404).json({message:'OTP is not valid'})
+    }
+    const password=data.password
+    const hashedPassword=await bcrypt.hash(password,10)
+    try {
+        const newUser=new User({
+            userName:data.userName,
+            userEmail:data.userEmail,
+            password:hashedPassword,
+            userPhone:data.userPhone
+        })
+        await newUser.save()
+        const accessToken=generateAccessToken(newUser)
+        const refreshToken=generateRefreshToken(newUser)
+        console.log(refreshToken)
+        res.cookie('refreshToken', refreshToken, { httpOnly: false, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) });
+        res.status(200).json({message:'user signup successfully',accessToken})
+    } catch (error) {
+        
+    }
+    
+}
+
 const UserLoginPostPage=async(req,res)=>{
     console.log(req.body)
+    const {email,password}=req.body
+    try {
+        const user=await User.findOne({userEmail:email})
+        if(!user){
+            return res.status(404).json({message:'user not founded'})
+        }
+        const originalPassword=await bcrypt.compare(password,user.password)
+        if(!originalPassword){
+            return res.status(404).json({message:'password is not match'})
+        }
+        const accessToken=generateAccessToken(user)
+        const refreshToken=generateRefreshToken(user)
+        // console.log(refreshToken)
+        res.cookie('refreshToken', refreshToken, { httpOnly: false, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) });
+        res.status(200).json({message:'user login successfully',accessToken})
+        console.log('its reached here')
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:'something went wrong with login'})
+    }
+   
+}
+const userHOmePage=async(req,res)=>{
+
 }
 module.exports={
     signupPostpage,
-    UserLoginPostPage
+    UserLoginPostPage,
+    verifyOtpForsignup,
+    refreshAccessToken,
+    userHOmePage
 }

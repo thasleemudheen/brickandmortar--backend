@@ -18,16 +18,7 @@ function generateFileToken() {
     return crypto.randomBytes(20).toString('hex');
   }
 
-  //generate tokens 
-  const ACCESS_TOKEN_SECRET=process.env.ACCESS_TOKEN
-  const REFRESH_TOKEN_SECRET=process.env.REFRESH_TOKEN
-  
-  const generateAccessToken=(vendor)=>{
-    return jwt.sign({ id: vendor._id, email: vendor.vendorEmail }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-    }
-  const generateRefreshToken=(vendor)=>{
-    return jwt.sign({ id: vendor._id, email: vendor.vendorEmail }, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
-  }
+ 
 
 const vendorSignupPost=async(req,res)=>{
      try {

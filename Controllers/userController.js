@@ -26,6 +26,7 @@ const signupPostpage=async(req,res)=>{
 }
 const refreshAccessToken = (req, res) => {
     const refreshToken = req.cookies.refreshToken;
+    // console.log('refresh token get from the cookie',refreshToken)
     if (!refreshToken) {
         return res.status(403).json({ message: 'Refresh token not provided' });
     }
@@ -34,9 +35,10 @@ const refreshAccessToken = (req, res) => {
         if (err) {
             return res.status(403).json({ message: 'Invalid refresh token' });
         }
-
+         console.log('user i get from the when creating the new access token',user)
         const newAccessToken = generateAccessToken(user);
-        res.json({ accessToken: newAccessToken });
+        console.log('newAccess token generated ',newAccessToken)
+        res.status(200).json({ accessToken: newAccessToken });
     });
 };
 
@@ -69,6 +71,7 @@ const verifyOtpForsignup=async(req,res)=>{
 }
 
 const UserLoginPostPage=async(req,res)=>{
+    // console.log(req)
     console.log(req.body)
     const {email,password}=req.body
     try {
@@ -78,12 +81,13 @@ const UserLoginPostPage=async(req,res)=>{
         }
         const originalPassword=await bcrypt.compare(password,user.password)
         if(!originalPassword){
-            return res.status(404).json({message:'password is not match'})
+            return res.status(403).json({message:'password is not match'})
         }
         const accessToken=generateAccessToken(user)
         const refreshToken=generateRefreshToken(user)
         // console.log(refreshToken)
         res.cookie('refreshToken', refreshToken, { httpOnly: false, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) });
+        console.log('refresh token saved to cookie')
         res.status(200).json({message:'user login successfully',accessToken})
         console.log('its reached here')
     } catch (error) {
@@ -93,7 +97,8 @@ const UserLoginPostPage=async(req,res)=>{
    
 }
 const userHOmePage=async(req,res)=>{
-
+     console.log('userid find from the protected user',req.user)
+     res.status(200).json({message:'this is home page and get the data'})
 }
 module.exports={
     signupPostpage,

@@ -10,4 +10,5 @@ router.get('/admin/location',adminController.locationGetPage)
 router.delete('/admin/deleteLocation/:id',adminController.adminDeleteLocation)
 router.patch('/admin/editLocation/:id',adminController.adminEditLocation)
 router.get('/admin/vendors',adminController.vendorsListGetPage)
+router.patch('/admin/changeStatus/:id',adminController.adminChangeStatusOfVendor)
 module.exports=router;

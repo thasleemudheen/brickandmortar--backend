@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-// const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'your-access-token-secret';
 require('dotenv').config()
 const protectRoute = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -8,12 +7,13 @@ const protectRoute = (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
+    console.log('token form the middleware',token)
     jwt.verify(token,process.env.ACCESS_TOKEN, (err, user) => {
         if (err) {
             return res.status(403).json({ message: 'Invalid token' });
         }
-
         req.user = user;  
+        console.log('its log from the middleware',req.user)
         next();
     });
 };

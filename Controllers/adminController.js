@@ -140,18 +140,40 @@ const adminEditLocation=async(req,res)=>{
                 // location.locationName=newLocationName
 }
 const vendorsListGetPage=async(req,res)=>{
-    console.log('request is here')
+    // console.log('request is here')
     const vendors=await Vendor.find()
     console.log(vendors)
     res.status(200).json({message:'vendor details passed ',vendors})
 }
-
+const adminChangeStatusOfVendor=async(req,res)=>{
+    // console.log(req)
+    console.log(req.params.id)
+    try {
+        const vendorId=req.params.id
+        const vendor=await Vendor.findById(vendorId)
+        if(!vendor){
+            return res.status(404).json({message:"vendor not found "})
+        }
+        console.log(vendor)
+        vendor.isApproved=!vendor.isApproved
+        await vendor.save()
+        console.log('after updating the status',vendor)
+        res.status(200).json({message:'status changed successfully',vendor})
+          
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:"something went wrong with updating detials"})
+    }
+   
+    
+}
 module.exports={
     postAdminLoginPage,
     locationAddPost,
     locationGetPage,
     adminDeleteLocation,
     adminEditLocation,
-    vendorsListGetPage
+    vendorsListGetPage,
+    adminChangeStatusOfVendor
 
 }

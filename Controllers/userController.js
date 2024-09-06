@@ -79,13 +79,16 @@ const UserLoginPostPage=async(req,res)=>{
         if(!user){
             return res.status(404).json({message:'user not founded'})
         }
+        if(user.isBlocked){
+            return res.status(403).json({message:'entry is restricted by the admin'})
+        }
         const originalPassword=await bcrypt.compare(password,user.password)
         if(!originalPassword){
             return res.status(403).json({message:'password is not match'})
         }
+        
         const accessToken=generateAccessToken(user)
         const refreshToken=generateRefreshToken(user)
-        // console.log(refreshToken)
         res.cookie('refreshToken', refreshToken, { httpOnly: false, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) });
         console.log('refresh token saved to cookie')
         res.status(200).json({message:'user login successfully',accessToken})

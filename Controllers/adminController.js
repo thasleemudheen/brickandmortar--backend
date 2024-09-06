@@ -177,12 +177,34 @@ const userListGetPage=async(req,res)=>{
         res.status(500).json({message:'something went wrong'})
     }
 }
+
 const adminBlockUser=async(req,res)=>{
-    console.log(req.body)
     const userId=req.params.id
+   console.log('user id form the paramas',userId)
+    try {
     const user=await User.findById(userId)
+    if(!user){
+        return res.status(404).json({message:'user not found'})
+    }
     console.log(user)
+    
+    console.log('Current user status:', user.isBlocked);
+    // Toggle the isBlocked status
+    user.isBlocked = !user.isBlocked;
+
+    console.log('Toggled user status:', user.isBlocked);
+
+    // Save the updated user document
+    await user.save();
+
+    console.log('Updated user status after save:', user.isBlocked);
+    res.status(200).json({message:'user blocked ',user})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:'internal server error'})
+    }  
 }
+
 module.exports={
     postAdminLoginPage,
     locationAddPost,

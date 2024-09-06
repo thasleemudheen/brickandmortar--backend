@@ -15,6 +15,10 @@ const userSchema=new mongoose.Schema({
     userPhone:{
         type:String,
         required:true
+    },
+    isBlocked:{
+        type:String,
+        default:true
     }
 })
 

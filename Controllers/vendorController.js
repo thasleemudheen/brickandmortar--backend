@@ -13,12 +13,12 @@ const multer = require('multer')
 const upload=multer({dest:'/uploads'})
 const Vendor=require('../Models/vendorModel')
 const tokenService=require('../services/tokenService')
+require('dotenv').config()
+
 
 function generateFileToken() {
     return crypto.randomBytes(20).toString('hex');
   }
-
- 
 
 const vendorSignupPost=async(req,res)=>{
      try {
@@ -104,30 +104,39 @@ const verifyOtpPage=async(req,res)=>{
     }
 }
 const vendorLoginPostPage=async(req,res)=>{
-      console.log(req.body)
+      // console.log(req.body)
       const {email,password}=req.body
-
-      const vendor=await Vendor.findOne({vendorEmail:email})
-      console.log('vendor before')
-      if(!vendor){
-        return res.status(404).json({message:'vendor did not find '})
+      try {
+        const vendor=await Vendor.findOne({vendorEmail:email})
+        // console.log('vendor before')
+        if(!vendor){
+          return res.status(404).json({message:'vendor did not find '})
+        }
+        // console.log('vendor after')
+        const originalPassword=await bcrypt.compare(password,vendor.password)
+        // console.log(originalPassword)
+        // console.log('vendor have value',vendor)
+        if(!originalPassword){
+          return res.status(404).json({message:'password is not valid'})
+        }
+        const isApproved=vendor.isApproved
+        // console.log(isApproved)
+        if(!isApproved){
+          return res.status(404).json({message:'your application is under verification process'})
+        }
+        const token=jwt.sign({
+          vendorId:vendor._id,
+          vendorEmail:vendor.vendorEmail},
+          process.env.JWT_SECRET,{expiresIn:'24h'}
+        )
+        res.cookie('vendorToken', token, { httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) });
+        res.status(200).json({message:'venodor successfully logged in ',token})
+      } catch (error) {
+          console.log(error)
+          res.status(500).json({message:"internal server error"})
       }
-      console.log('vendor after')
-      const originalPassword=await bcrypt.compare(password,vendor.password)
-      console.log(originalPassword)
-      console.log('vendor have value',vendor)
-      if(!originalPassword){
-        return res.status(404).json({message:'password is not valid'})
-      }
-      const isApproved=vendor.isApproved
-      console.log(isApproved)
-      if(!isApproved){
-        return res.status(404).json({message:'your application is under verification process'})
-      }
-      
-      
-      
-}
+     
+    }
 
 module.exports={
    vendorSignupPost,

@@ -11,4 +11,6 @@ router.delete('/admin/deleteLocation/:id',adminController.adminDeleteLocation)
 router.patch('/admin/editLocation/:id',adminController.adminEditLocation)
 router.get('/admin/vendors',adminController.vendorsListGetPage)
 router.patch('/admin/changeStatus/:id',adminController.adminChangeStatusOfVendor)
+router.get('/admin/users',adminController.userListGetPage)
+router.patch('/admin/blockUser/:id',adminController.adminBlockUser)
 module.exports=router;

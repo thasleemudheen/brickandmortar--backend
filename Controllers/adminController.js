@@ -5,6 +5,7 @@ const jwt=require('jsonwebtoken')
 const bcrypt=require('bcrypt')
 const Vendor=require('../Models/vendorModel')
 const cookieParser=require('cookie-parser')
+const User=require('../Models/userModel')
 app.use(cookieParser())
 require('dotenv').config()
 const postAdminLoginPage=async(req,res)=>{
@@ -164,8 +165,23 @@ const adminChangeStatusOfVendor=async(req,res)=>{
         console.log(error)
         res.status(500).json({message:"something went wrong with updating detials"})
     }
-   
-    
+}
+
+const userListGetPage=async(req,res)=>{
+    try {
+        const users=await User.find()
+        // console.log(users)
+        res.status(200).json({message:'users list',users})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:'something went wrong'})
+    }
+}
+const adminBlockUser=async(req,res)=>{
+    console.log(req.body)
+    const userId=req.params.id
+    const user=await User.findById(userId)
+    console.log(user)
 }
 module.exports={
     postAdminLoginPage,
@@ -174,6 +190,8 @@ module.exports={
     adminDeleteLocation,
     adminEditLocation,
     vendorsListGetPage,
-    adminChangeStatusOfVendor
+    adminChangeStatusOfVendor,
+    userListGetPage,
+    adminBlockUser
 
 }

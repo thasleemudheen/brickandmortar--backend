@@ -36,7 +36,7 @@ const refreshAccessToken = (req, res) => {
             return res.status(403).json({ message: 'Invalid refresh token' });
         }
          console.log('user i get from the when creating the new access token',user)
-        const newAccessToken = generateAccessToken(user);
+        const newAccessToken = generateAccessToken({ _id: user.userId, userEmail: user.userEmail });
         console.log('newAccess token generated ',newAccessToken)
         res.status(200).json({ accessToken: newAccessToken });
     });
@@ -94,10 +94,9 @@ const UserLoginPostPage=async(req,res)=>{
         console.log(error)
         res.status(500).json({message:'something went wrong with login'})
     }
-   
 }
 const userHOmePage=async(req,res)=>{
-     console.log('userid find from the protected user',req.user)
+     console.log('userid find from the protected user',req.user.userId)
      res.status(200).json({message:'this is home page and get the data'})
 }
 module.exports={

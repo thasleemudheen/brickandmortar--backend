@@ -13,4 +13,6 @@ router.get('/admin/vendors',adminController.vendorsListGetPage)
 router.patch('/admin/changeStatus/:id',adminController.adminChangeStatusOfVendor)
 router.get('/admin/users',adminController.userListGetPage)
 router.patch('/admin/blockUser/:id',adminController.adminBlockUser)
+router.post('/admin/addProperty',adminController.adminAddPropertyType)
+router.get('/admin/property',adminController.propertyListGetPage)
 module.exports=router;

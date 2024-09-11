@@ -204,7 +204,41 @@ const adminBlockUser=async(req,res)=>{
         res.status(500).json({message:'internal server error'})
     }  
 }
+const adminAddPropertyType=async(req,res)=>{
+    console.log('admin add property type ',req.body)
+    const {PropertyName}=req.body
+    try {
+        console.log('this is the property name',PropertyName)
+    const admin=await Admin.findOne()
+    if(!admin){
+        return res.status(404).json({message:'admin not found'})
+    }
+    admin.propertyType.push({ propertyName: PropertyName })
+    await admin.save()
+    // const propertyType=admin.propertyType
+    const addedProperty = admin.propertyType[admin.propertyType.length - 1];
 
+    res.status(200).json({message:'property name added successfully',propertyType: addedProperty})
+    console.log('after saving the details to the database',admin)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:'internal server error'})
+    }
+} 
+const propertyListGetPage=async(req,res)=>{
+    try {
+        const admin=await Admin.findOne()
+        //  console.log(admin)
+         const propertyType=admin.propertyType
+         console.log(propertyType)
+         res.status(200).json({message:'this is the property type list',propertyType})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message:'internal server error'})
+    }
+    
+
+}
 module.exports={
     postAdminLoginPage,
     locationAddPost,
@@ -214,6 +248,8 @@ module.exports={
     vendorsListGetPage,
     adminChangeStatusOfVendor,
     userListGetPage,
-    adminBlockUser
+    adminBlockUser,
+    adminAddPropertyType,
+    propertyListGetPage
 
 }

@@ -11,6 +11,12 @@ const locationSchema=new mongoose.Schema({
     }
 })
 
+const propertyTypeSchema = new mongoose.Schema({
+    propertyName: {
+        type: String,
+        required: true
+    }
+});
 
 const adminSchema=new mongoose.Schema({
     email:{
@@ -24,7 +30,11 @@ const adminSchema=new mongoose.Schema({
     location:{
         type:[locationSchema],
         required:true
-    }
+    },
+    propertyType: {
+        type: [propertyTypeSchema],
+        required: true
+    }    
 })
 const Admin= mongoose.model('Admin',adminSchema)
 module.exports=Admin

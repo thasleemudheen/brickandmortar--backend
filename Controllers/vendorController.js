@@ -108,7 +108,7 @@ const vendorLoginPostPage=async(req,res)=>{
       const {email,password}=req.body
       try {
         const vendor=await Vendor.findOne({vendorEmail:email})
-        // console.log('vendor before')
+          // console.log('vendor before')
         if(!vendor){
           return res.status(404).json({message:'vendor did not find '})
         }

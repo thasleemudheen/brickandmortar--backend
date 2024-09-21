@@ -15,4 +15,6 @@ router.get('/admin/users',adminController.userListGetPage)
 router.patch('/admin/blockUser/:id',adminController.adminBlockUser)
 router.post('/admin/addProperty',adminController.adminAddPropertyType)
 router.get('/admin/property',adminController.propertyListGetPage)
+router.patch('/admin/editProperty/:id',adminController.adminEditPropertyName)
+router.delete('/admin/deleteProperty/:id',adminController.adminDeletePorpertyType)
 module.exports=router;

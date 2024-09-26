@@ -57,7 +57,7 @@ const vendorSignupPost=async(req,res)=>{
 const verifyOtpPage=async(req,res)=>{
     try {
       const originOtp=req.cookies.otp
-    console.log(originOtp)
+    // console.log(originOtp)
     const fileToken = req.cookies.fileToken;
     const {otp,data}=req.body
     console.log('user entered otop',otp)
@@ -70,14 +70,14 @@ const verifyOtpPage=async(req,res)=>{
     const password=data.password
    
     const hashedPassword= await bcrypt.hash(password,10)
-    console.log(vendorName)
+    // console.log(vendorName)
     const tempStorage = req.app.locals.tempStorage || {};
     if(Object.keys(tempStorage).length==0){
         return res.status(404).json({message:'you want to upload the image again'})
     }
     // console.log('Temp storage items:', tempStorage);
     const productImage=Object.values(tempStorage)
- console.log(productImage)
+//  console.log(productImage)
 //  const productImage=req.files
  let imageUrls =null
 
@@ -129,7 +129,7 @@ const vendorLoginPostPage=async(req,res)=>{
           vendorEmail:vendor.vendorEmail},
           process.env.JWT_SECRET,{expiresIn:'24h'}
         )
-        res.cookie('vendorToken', token, { httpOnly: true, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) });
+        res.cookie('vendorToken', token, { httpOnly: false, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) });
         res.status(200).json({message:'venodor successfully logged in ',token})
       } catch (error) {
           console.log(error)
@@ -137,9 +137,15 @@ const vendorLoginPostPage=async(req,res)=>{
       }
      
     }
-
+ const vendorAddPropertyPost=async(req,res)=>{
+   console.log(req.body)
+  //  console.log('req.fiel',req.files)
+   const vendorId=req.vendorId
+   console.log('vendor id ',vendorId)
+ }
 module.exports={
    vendorSignupPost,
    verifyOtpPage,
-   vendorLoginPostPage
+   vendorLoginPostPage,
+   vendorAddPropertyPost
 }

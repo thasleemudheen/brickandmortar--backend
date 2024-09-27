@@ -4,9 +4,10 @@ require('dotenv').config()
 
 const vendorAuth = (req, res, next) => {
     const token = req.cookies.vendorToken;
-    console.log('token from middleware',token)
+    // console.log(req)
+    // console.log('token from middleware',token)
     if (!token) {
-        return res.status(404).json({ message: 'vendor not found' });
+        return res.status(404).json({ message: 'not found please login and try again' });
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);

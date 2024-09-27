@@ -139,7 +139,12 @@ const vendorLoginPostPage=async(req,res)=>{
     }
  const vendorAddPropertyPost=async(req,res)=>{
    console.log(req.body)
-  //  console.log('req.fiel',req.files)
+   console.log('req.fiel',req.files)
+   const {distancetoNearbyplaces,AdditionalDetails}=req.body
+   let parsedAdditionalDetails = JSON.parse(distancetoNearbyplaces)
+   let parsedDistanceNearbyPlaces=JSON.parse(AdditionalDetails)
+   console.log('parsed additionl',parsedDistanceNearbyPlaces)
+    console.log('typeof', parsedAdditionalDetails)
    const vendorId=req.vendorId
    console.log('vendor id ',vendorId)
  }

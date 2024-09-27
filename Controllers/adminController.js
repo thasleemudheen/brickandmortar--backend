@@ -66,20 +66,12 @@ const locationAddPost=async(req,res)=>{
 }
 
 const locationGetPage=async(req,res)=>{
+     console.log('req is here')
     try {
-        const token=req.cookies.adminToken
-        // console.log(token)
-        if(!token){
-            return res.status(404).json({message:'token not found'})
-        }
-        const decoded=jwt.verify(token,process.env.JWT_SECRET)
-        const adminId=decoded.id
-        const admin=await Admin.findById(adminId)
-        // console.log(admin)
-        if(!admin){
-            return res.status(404).json({message:'admin not found'})
-        }
-        const locations=admin.location        
+        const admins=await Admin.find({},'location')
+        // console.log('admins',admins)
+        const locations= admins.map(admin=>admin.location).flat()
+        // console.log('locations',locations)     
         res.status(200).json({message:'location founded',locations})
     } catch (error) {
         console.log(error)

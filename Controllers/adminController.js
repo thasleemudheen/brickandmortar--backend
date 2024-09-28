@@ -66,7 +66,7 @@ const locationAddPost=async(req,res)=>{
 }
 
 const locationGetPage=async(req,res)=>{
-     console.log('req is here')
+    //  console.log('req is here')
     try {
         const admins=await Admin.find({},'location')
         // console.log('admins',admins)

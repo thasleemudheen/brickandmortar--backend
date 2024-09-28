@@ -13,6 +13,7 @@ const multer = require('multer')
 const upload=multer({dest:'/uploads'})
 const Vendor=require('../Models/vendorModel')
 const tokenService=require('../services/tokenService')
+const Property = require('../Models/propertyModel')
 require('dotenv').config()
 
 
@@ -137,20 +138,111 @@ const vendorLoginPostPage=async(req,res)=>{
       }
      
     }
- const vendorAddPropertyPost=async(req,res)=>{
-   console.log(req.body)
-   console.log('req.fiel',req.files)
-   const {distancetoNearbyplaces,AdditionalDetails}=req.body
-   let parsedAdditionalDetails = JSON.parse(distancetoNearbyplaces)
-   let parsedDistanceNearbyPlaces=JSON.parse(AdditionalDetails)
-   console.log('parsed additionl',parsedDistanceNearbyPlaces)
-    console.log('typeof', parsedAdditionalDetails)
-   const vendorId=req.vendorId
-   console.log('vendor id ',vendorId)
- }
+    const vendorAddPropertyPost = async (req, res) => {
+      // console.log(req.body);
+      // console.log('req.files', req.files);
+    
+      const propertyImages = req.files;
+      const vendorId = req.vendorId;
+    
+      const {
+        PropertyName, propertyPrice, PropertyType, State,
+        location, exactlocation, description,
+        distancetoNearbyplaces, AdditionalDetails
+      } = req.body;
+    
+      try {
+        // Parse the JSON strings from the request body
+        let parsedAdditionalDetails, parsedDistanceNearbyPlaces;
+    
+        try {
+          parsedAdditionalDetails = JSON.parse(AdditionalDetails); // this is additional details
+          parsedDistanceNearbyPlaces = JSON.parse(distancetoNearbyplaces); // this is distance to nearby places
+        } catch (err) {
+          return res.status(400).json({ message: "Invalid JSON format in AdditionalDetails or distancetoNearbyplaces" });
+        }
+       const property=await Property.find()
+        // console.log('parsed additional details:', parsedAdditionalDetails);
+        // console.log('parsed distance to nearby places:', parsedDistanceNearbyPlaces);
+        // console.log('vendor id', vendorId);
+    
+        // Uploading images to Cloudinary and storing URLs
+        const imageUrls = [];
+    
+        // Proper use of Promise.all to handle image uploads
+        await Promise.all(propertyImages.map(async (image) => {
+          const result = await cloudinary.uploader.upload(image.path);
+          imageUrls.push(result.secure_url);
+        }));
+        const getFirstNonEmptyValue = (key, array) => {
+          for (let i = 0; i < array.length; i++) {
+            if (array[i][key] && array[i][key].trim() !== '') {
+              return array[i][key]; // Return the first non-empty value
+            }
+          }
+          return ''; // If all are empty, return empty string
+        };
+    
+        // Combining parsed additional details into a single object
+        const additionalDetails = {
+          rooms: getFirstNonEmptyValue('Rooms', parsedAdditionalDetails),
+          bathrooms: getFirstNonEmptyValue('bathrooms', parsedAdditionalDetails),
+          floors: getFirstNonEmptyValue('floors', parsedAdditionalDetails)
+        };
+    
+        // Combining parsed distance to nearby places into a single object
+        const distancetoNearbyPlaces = {
+          school: getFirstNonEmptyValue('School', parsedDistanceNearbyPlaces),
+          hospital: getFirstNonEmptyValue('Hospital', parsedDistanceNearbyPlaces),
+          placeOfWorship: getFirstNonEmptyValue('Placeofworship', parsedDistanceNearbyPlaces),
+          restaurant: getFirstNonEmptyValue('restaurant', parsedDistanceNearbyPlaces)
+        };
+        console.log(distancetoNearbyPlaces)
+        console.log(additionalDetails)
+        // Creating new property document
+        const newProperty = new Property({
+          propertyName: PropertyName,
+          propertyPrice: propertyPrice,
+          propertyType: PropertyType,
+          propertyState: State,
+          propertyLocation: location,
+          // Combine all fields into a single object
+          additionalDetails: additionalDetails,
+          distancetoNearbyPlaces:distancetoNearbyPlaces ,
+          exactLocation: exactlocation,
+          description: description,
+          images: imageUrls, // store array of image URLs
+          vendor: vendorId
+        });
+    
+        console.log('new property ', newProperty);
+        await newProperty.save();
+        res.status(200).json({ message: 'Property added successfully',property });
+    
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    };
+    const propertyListGet=async(req,res)=>{
+      console.log('get request is heerre')
+      try {
+         const properties=await Property.find()
+        //  console.log(properties)
+         const vendorId=properties.map((pro)=>pro.vendor)
+         console.log(vendorId)
+         const vendor=await Vendor.findById(vendorId)
+        //  console.log(vendor)
+        res.status(200).json({message:'this is the property list',properties})
+      } catch (error) {
+        console.log(error)
+        res.status(500).json({message:'internal server error'})
+      }
+    }
 module.exports={
    vendorSignupPost,
    verifyOtpPage,
    vendorLoginPostPage,
-   vendorAddPropertyPost
+   vendorAddPropertyPost,
+   propertyListGet
 }

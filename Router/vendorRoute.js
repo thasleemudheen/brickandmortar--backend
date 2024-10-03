@@ -9,5 +9,6 @@ router.post('/vendor/signup',upload.single('file'),vendorController.vendorSignup
 router.post('/vendor/verifyOtp',vendorController.verifyOtpPage)
 router.post('/vendor/login',vendorController.vendorLoginPostPage)
 router.post('/vendor/addProperty',vendorAuth,upload.array('image',10),vendorController.vendorAddPropertyPost)
-router.get('/vendor/properties',vendorController.propertyListGet)
+router.get('/vendor/properties',vendorAuth,vendorController.propertyListGet)
+router.patch('/vendor/editProuduct',vendorAuth,upload.array('images',10),vendorController.editVendorProperty)
 module.exports=router

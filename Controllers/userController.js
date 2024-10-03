@@ -43,7 +43,7 @@ const refreshAccessToken = (req, res) => {
 };
 
 const verifyOtpForsignup=async(req,res)=>{
-    console.log(req.body)
+    // console.log(req.body)
     const origin=req.cookies.uotp
     const {data,otp}=req.body
     if(origin!==otp){
@@ -61,7 +61,7 @@ const verifyOtpForsignup=async(req,res)=>{
         await newUser.save()
         const accessToken=generateAccessToken(newUser)
         const refreshToken=generateRefreshToken(newUser)
-        console.log(refreshToken)
+        // console.log(refreshToken)
         res.cookie('refreshToken', refreshToken, { httpOnly: false, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) });
         res.status(200).json({message:'user signup successfully',accessToken})
     } catch (error) {
@@ -72,7 +72,7 @@ const verifyOtpForsignup=async(req,res)=>{
 
 const UserLoginPostPage=async(req,res)=>{
     // console.log(req)
-    console.log(req.body)
+    // console.log(req.body)
     const {email,password}=req.body
     try {
         const user=await User.findOne({userEmail:email})
@@ -99,7 +99,7 @@ const UserLoginPostPage=async(req,res)=>{
     }
 }
 const userHOmePage=async(req,res)=>{
-     console.log('userid find from the protected user',req.user.userId)
+    //  console.log('userid find from the protected user',req.user.userId)
      res.status(200).json({message:'this is home page and get the data'})
 }
 module.exports={

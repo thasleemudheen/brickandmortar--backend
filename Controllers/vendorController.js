@@ -140,7 +140,7 @@ const vendorLoginPostPage=async(req,res)=>{
     }
     const vendorAddPropertyPost = async (req, res) => {
       // console.log(req.body);
-      // console.log('req.files', req.files);
+      console.log('req.files', req.files);
     
       const propertyImages = req.files;
       const vendorId = req.vendorId;
@@ -197,8 +197,8 @@ const vendorLoginPostPage=async(req,res)=>{
           placeOfWorship: getFirstNonEmptyValue('Placeofworship', parsedDistanceNearbyPlaces),
           restaurant: getFirstNonEmptyValue('restaurant', parsedDistanceNearbyPlaces)
         };
-        console.log(distancetoNearbyPlaces)
-        console.log(additionalDetails)
+        // console.log(distancetoNearbyPlaces)
+        // console.log(additionalDetails)
         // Creating new property document
         const newProperty = new Property({
           propertyName: PropertyName,
@@ -225,13 +225,14 @@ const vendorLoginPostPage=async(req,res)=>{
       }
     };
     const propertyListGet=async(req,res)=>{
-      console.log('get request is heerre')
+      // console.log('get request is heerre')
+      const vendorId=req.vendorId
       try {
-         const properties=await Property.find()
+         const properties=await Property.find({vendor:vendorId})
         //  console.log(properties)
-         const vendorId=properties.map((pro)=>pro.vendor)
-         console.log(vendorId)
-         const vendor=await Vendor.findById(vendorId)
+        //  const vendorId=properties.map((pro)=>pro.vendor)
+        //  console.log(vendorId)
+        //  const vendor=await Vendor.findById(vendorId)
         //  console.log(vendor)
         res.status(200).json({message:'this is the property list',properties})
       } catch (error) {
@@ -239,10 +240,30 @@ const vendorLoginPostPage=async(req,res)=>{
         res.status(500).json({message:'internal server error'})
       }
     }
+    const editVendorProperty=async(req,res)=>{
+      // Log the incoming request body and files
+  console.log('Request body data from the frontend:', req.body);
+   const propertyId=req.body._id
+   const vendorId=req.vendorId
+   const {propertyName,propertyPrice,propertyType,propertyState,propertyLocation,exactLocation,description,images,imagesToDelete}=req.body
+   
+  // Parse the JSON fields from the form data
+  const additionalDetails = JSON.parse(req.body.additionalDetails);
+  const distancetoNearbyPlaces = JSON.parse(req.body.distancetoNearbyPlaces);
+
+  console.log('Parsed additional details:', additionalDetails);
+  console.log('Parsed distance to nearby places:', distancetoNearbyPlaces);
+
+  // Handle uploaded files (images)
+  console.log('Uploaded files:', req.files); // Files will be available in req.files
+
+
+    }
 module.exports={
    vendorSignupPost,
    verifyOtpPage,
    vendorLoginPostPage,
    vendorAddPropertyPost,
-   propertyListGet
+   propertyListGet,
+   editVendorProperty
 }
